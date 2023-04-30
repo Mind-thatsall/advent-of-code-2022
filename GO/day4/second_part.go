@@ -17,6 +17,7 @@ func main() {
 	defer f.Close()
 
 	sc := bufio.NewScanner(f)
+
 	var nbPairs int
 
 	for sc.Scan() {
@@ -24,11 +25,11 @@ func main() {
 
 		fmt.Sscanf(sc.Text(), "%d-%d,%d-%d", &startFirstPair, &endFirstPair, &startSecondPair, &endSecondPair)
 
-		if startFirstPair <= startSecondPair && endFirstPair >= endSecondPair || startSecondPair <= startFirstPair && endSecondPair >= endFirstPair {
+		if startSecondPair <= endFirstPair && endSecondPair >= startFirstPair || startFirstPair <= endSecondPair && endFirstPair >= startSecondPair {
 			nbPairs++
 		}
-
 	}
 
 	fmt.Println(nbPairs)
+
 }
