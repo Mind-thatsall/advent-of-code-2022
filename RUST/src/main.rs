@@ -1,54 +1,70 @@
-use std::{fs, vec};
+use std::{collections::HashMap, fs};
 
-use nom::{branch::alt, bytes::streaming::tag, IResult};
+fn solution(input: &str) -> String {
+    let cmds: Vec<Vec<&str>> = input
+        .lines()
+        .map(|line| line.split_whitespace().collect::<Vec<&str>>())
+        .collect();
 
-enum Operation {
-    Cd(Cd),
-    Ls(Vec<String>),
+    let dir_sizes: Vec<usize> = dir_sizes(cmds);
+
+    let part1 = dir_sizes
+        .iter()
+        .filter(|&&size| size <= 100_000)
+        .sum::<usize>()
+        .to_string();
+
+    part1
 }
 
-enum Cd {
-    Out,
-    In(String),
-}
+fn dir_sizes(cmds: Vec<Vec<&str>>) -> Vec<usize> {
+    let mut stack: Vec<String> = Vec::new();
+    let mut dir_sizes: HashMap<String, usize> = HashMap::new();
 
-enum Files {
-    File { size: usize, name: String },
-    Dir(String),
-}
+    for cmd in cmds {
+        match cmd.as_slice() {
+            ["$", "cd", "/"] => {
+                stack.clear();
+                stack.push("root".to_string())
+            }
+            ["$", "cd", ".."] => {
+                stack.pop();
+                continue;
+            }
+            ["$", "cd", folder] => {
+                stack.push(folder.to_string());
+                continue;
+            }
+            ["$", "ls"] => continue,
+            ["dir", _] => continue,
+            [file_size, _] => {
+                let file_size_to_number = file_size.parse::<usize>().unwrap();
 
-impl Operation {
-    fn ls(line: &str) {
-        println!("{}", line)
-    }
+                for i in 0..stack.len() {
+                    let path = stack[..=i].join("/");
 
-    fn cd(line: &str) {
-        if line.len() != 0 {
-            println!("in a directory")
-        } else {
+                    dir_sizes
+                        .entry(path.to_string())
+                        .and_modify(|size| *size += file_size_to_number)
+                        .or_insert(file_size_to_number);
+                }
+
+                continue;
+            }
+
+            _ => (),
         }
     }
-}
 
-fn parse(input: &str) -> IResult<&str, Operation> {
-    let (input, _) = tag("$ ")(input)?;
-    let (input, cmd) = alt((tag("ls"), tag("cd")))(input)?;
+    let dir_sizes_to_vec: Vec<usize> = dir_sizes.values().cloned().collect();
 
-    match cmd {
-        "ls" => Operation::ls(input),
-        "cd" => Operation::cd(input),
-        _ => println!("unknown file type"),
-    }
-
-    Ok((input, Operation::Ls(vec![])))
+    dir_sizes_to_vec
 }
 
 fn main() {
-    // read file
-    let file = fs::read_to_string("input").unwrap();
+    let input = fs::read_to_string("input").unwrap();
 
-    file.lines().for_each(|line| match parse(line) {
-        Ok(line) => (),
-        Err(err) => println!("Error {}", err),
-    })
+    let test = solution(&input);
+
+    println!("{}", test)
 }
