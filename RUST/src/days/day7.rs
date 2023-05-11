@@ -75,7 +75,7 @@ fn dir_sizes(cmds: Vec<Vec<&str>>) -> Vec<usize> {
 }
 
 pub fn run() {
-    let input = fs::read_to_string("../inputs/day7").unwrap();
+    let input = fs::read_to_string("src/inputs/day7").unwrap();
 
     let test = solution(&input);
 
