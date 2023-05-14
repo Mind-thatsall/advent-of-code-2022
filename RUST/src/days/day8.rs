@@ -29,6 +29,7 @@ fn scenic_score_refactored(grid: &Vec<Vec<u8>>, height: &usize, width: &usize) -
             let mut scenic_score = 1;
 
             // grid[y][0..x].iter().rev() => going from the tree to the edge
+            // left side
             scenic_score *= if let Some((pos, _)) = grid[y][0..x]
                 .iter()
                 .rev()
@@ -40,6 +41,7 @@ fn scenic_score_refactored(grid: &Vec<Vec<u8>>, height: &usize, width: &usize) -
                 x
             };
 
+            // right side
             scenic_score *= if let Some((pos, _)) = grid[y][(x + 1)..]
                 .iter()
                 .enumerate()
@@ -50,6 +52,7 @@ fn scenic_score_refactored(grid: &Vec<Vec<u8>>, height: &usize, width: &usize) -
                 width - x - 1
             };
 
+            // top side
             scenic_score *= if let Some((pos, _)) = grid[0..y]
                 .iter()
                 .rev()
@@ -61,6 +64,9 @@ fn scenic_score_refactored(grid: &Vec<Vec<u8>>, height: &usize, width: &usize) -
                 y
             };
 
+            dbg!(scenic_score, grid[y][x]);
+
+            // bottom side
             scenic_score *= if let Some((pos, _)) = grid[(y + 1)..]
                 .iter()
                 .enumerate()
